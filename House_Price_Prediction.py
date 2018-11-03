@@ -49,3 +49,31 @@ test_house_size_norm = normalize(test_house_price)
 # Set up the TensorFlow placeholders that get updated as we decend down the gradient
 tf_house_size = tf.placeholder("float", name-"house_size")
 tf_price = tf.placeholder("float", name="price")
+
+
+
+tf_price_prod = tf.add(tf.multiply(tf_size_factor, tf_house_size), tf_price_offset)
+
+
+#Define the loss Function (how much error) - Mean swaured error
+tf_cost = tf.reduce_sum(tf.pow(tf_price_pred-tf_price, 2))/(2*num_train_samples)
+
+#Optimzer learning rate
+learning_rate = 0.1
+
+#Define the gradient descent optimizer that will minimize the loss of defined in the operation "cost"
+optimizer = tf.train.GradientDescentOptimizer(learning_rate).minimize(tf_cost)
+
+# Initialize the variables
+init = tf.global_variables_initializer()
+
+# Launch the graph in the session
+with tf.session() as sess
+    sees.run(init)
+
+    # Keep iterating the training data
+    for interation in range(num_training_iter):
+
+        # Fit all training data
+        for(x, y) in zip(train_house_size_norm, train_price_norm):
+            sess.run(optimizer, feed_dict=(tf.test_house_size: x, tf_price: y))
