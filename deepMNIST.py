@@ -19,48 +19,51 @@ x_image = tf.reshape(x, [-1,28,28,1], name="x_image")
 # Define helper functions to created weights and baises variables, and convolution, and pooling layers
 #   We are using RELU as our activation function.  These must be initialized to a small positive number
 #   and with some noise so you don't end up going to zero when comparing diffs
-def weight_variable(shape):
+def weight_variable(shape, name=None):
     initial = tf.truncated_normal(shape, stddev=0.1)
-    return tf.Variable(initial)
+    return tf.Variable(initia, name=name)
 
-def bias_variable(shape):
+def bias_variable(shape, name=None):
     initial = tf.constant(0.1, shape=shape)
-    return tf.Variable(initial)
+    return tf.Variable(initial, name=name)
 
 #   Convolution and Pooling - we do Convolution, and then pooling to control overfitting
-def conv2d(x, W):
-    return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME')
+def conv2d(x, W, name=None):
+    return tf.nn.conv2d(x, W, strides=[1, 1, 1, 1], padding='SAME', name=name)
 
-def max_pool_2x2(x):
+def max_pool_2x2(x, name=None):
     return tf.nn.max_pool(x, ksize=[1, 2, 2, 1],
-                        strides=[1, 2, 2, 1], padding='SAME')
+                        strides=[1, 2, 2, 1], padding='SAME', name=name)
 
 # Define layers in the NN
 
 # 1st Convolution layer
-# 32 features for each 5X5 patch of the image
-W_conv1 = weight_variable([5, 5, 1, 32])
-b_conv1 = bias_variable([32])
+with tf.name_scope("Conv1")# 32 features for each 5X5 patch of the image
+W_conv1 = weight_variable([5, 5, 1, 32], name="weight")
+b_conv1 = bias_variable([32], name="bias")
 # Do convolution on images, add bias and push through RELU activation
-h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1)
+h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1, name="relu")
 # take results and run through max_pool
-h_pool1 = max_pool_2x2(h_conv1)
+h_pool1 = max_pool_2x2(h_conv1, name="pool")
 
 # 2nd Convolution layer
 # Process the 32 features from Convolution layer 1, in 5 X 5 patch.  Return 64 features weights and biases
-W_conv2 = weight_variable([5, 5, 32, 64])
-b_conv2 = bias_variable([64])
-# Do convolution of the output of the 1st convolution layer.  Pool results
-h_conv2 = tf.nn.relu(conv2d(h_pool1, W_conv2) + b_conv2)
-h_pool2 = max_pool_2x2(h_conv2)
+with tf.name_scope("Conv2")
+W_conv1 = weight_variable([5, 5, 1, 32], name="weight")
+b_conv1 = bias_variable([32], name="bias")
+# Do convolution on images, add bias and push through RELU activation
+h_conv1 = tf.nn.relu(conv2d(x_image, W_conv1) + b_conv1, name="relu")
+# take results and run through max_pool
+h_pool1 = max_pool_2x2(h_conv1, name="pool")
 
 # Fully Connected Layer
-W_fc1 = weight_variable([7 * 7 * 64, 1024])
-b_fc1 = bias_variable([1024])
+with tf.name_scope("FC")
+W_fc1 = weight_variable([7 * 7 * 64, 1024], name="weight")
+b_fc1 = bias_variable([1024], name="bias")
 
 #   Connect output of pooling layer 2 as input to full connected layer
 h_pool2_flat = tf.reshape(h_pool2, [-1, 7*7*64])
-h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1)
+h_fc1 = tf.nn.relu(tf.matmul(h_pool2_flat, W_fc1) + b_fc1, name="relu")
 
 # dropout some neurons to reduce overfitting
 keep_prob = tf.placeholder(tf.float32)  # get dropout probability as a training input.
